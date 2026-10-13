@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitCalc 16:8 Pro - Tính Chỉ Số Body & Thực Đơn Giảm Cân</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 py-4 px-6 flex justify-between items-center shadow-sm">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white text-lg">🥗</div>
+      <span class="font-bold text-lg text-slate-900">FitCalc 16:8 Pro</span>
+    </div>
+    <span class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full font-medium border border-emerald-200">
+      Mẹo Giảm Cân Khoa Học
+    </span>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-2xl w-full mx-auto p-4 sm:p-6 flex-grow space-y-6">
+    
+    <!-- Form Nhập Thông Tin -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-4">
+      <h2 class="text-lg font-bold text-slate-900 border-b pb-2 flex items-center gap-2">
+        <span>📊</span> Tính Chỉ Số Cơ Thể (BMI & TDEE)
+      </h2>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Giới tính</label>
+          <select id="gender" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="male">Nam</option>
+            <option value="female">Nữ</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tuổi</label>
+          <input type="number" id="age" value="30" placeholder="VD: 30" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Chiều cao (cm)</label>
+          <input type="number" id="height" value="170" placeholder="VD: 170" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Cân nặng (kg)</label>
+          <input type="number" id="weight" value="75" placeholder="VD: 75" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Mức độ vận động</label>
+        <select id="activity" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          <option value="1.2">Ít vận động (Dân văn phòng, ít tập)</option>
+          <option value="1.375">Vận động nhẹ (Tập 1-3 buổi/tuần)</option>
+          <option value="1.55" selected>Vận động vừa (Tập 3-5 buổi/tuần, đá bóng/gym)</option>
+          <option value="1.725">Vận động nặng (Tập 6-7 buổi/tuần)</option>
+        </select>
+      </div>
+
+      <button onclick="calculateFit()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition text-sm cursor-pointer flex items-center justify-center space-x-2">
+        <span>⚡ Tính Kết Quả & Gợi Ý Thực Đơn</span>
+      </button>
+    </div>
+
+    <!-- Kết quả tính toán -->
+    <div id="resultBox" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-5">
+      <h3 class="text-lg font-bold text-slate-900 border-b pb-2 flex items-center gap-2">
+        <span>🎯</span> Kết Quả & Lượng Calo Cần Ăn
+      </h3>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+          <span class="text-xs text-slate-500 block">Chỉ số BMI</span>
+          <strong id="bmiVal" class="text-lg text-emerald-600 font-bold">22.5</strong>
+          <span id="bmiStatus" class="text-[10px] block font-medium text-slate-600">Bình thường</span>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+          <span class="text-xs text-slate-500 block">Calo duy trì (TDEE)</span>
+          <strong id="tdeeVal" class="text-lg text-blue-600 font-bold">2200</strong>
+          <span class="text-[10px] block text-slate-400">kcal/ngày</span>
+        </div>
+        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 col-span-2 sm:col-span-1">
+          <span class="text-xs text-emerald-800 block">Calo giảm cân 16:8</span>
+          <strong id="cutCaloVal" class="text-lg text-emerald-700 font-bold">1700</strong>
+          <span class="text-[10px] block text-emerald-600 font-medium">Thâm hụt 500 kcal</span>
+        </div>
+      </div>
+
+      <!-- Lịch Trình Nhịn Ăn 16:8 -->
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-1.5">
+        <strong class="font-bold text-sm block text-amber-950">⏰ Khung Giờ Ăn Nhịn 16:8 Gợi Ý (Chuẩn Nhất):</strong>
+        <p>• <strong>Khung ăn (8 tiếng):</strong> 12:00 Trưa ➔ 20:00 Tối (Được ăn 2 bữa chính + 1 bữa phụ).</p>
+        <p>• <strong>Khung nhịn (16 tiếng):</strong> 20:00 Tối ➔ 12:00 Trưa hôm sau (Chỉ uống nước lọc, trà xanh hoặc cà phê đen không đường).</p>
+      </div>
+
+      <!-- Gợi ý thực đơn high-protein -->
+      <div class="space-y-2">
+        <h4 class="font-bold text-sm text-slate-800">🥗 Gợi Ý Mẫu Thực Đơn 16:8 (High Protein):</h4>
+        <div class="text-xs text-slate-600 space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+          <p><strong>Bữa 1 (12:00 Trưa):</strong> 200g Ức gà/Bò + 1 củ khoai lang luộc + Rau xanh luộc tùy thích + 1 quả trứng luộc.</p>
+          <p><strong>Bữa phụ (16:00 Chiều):</strong> 1 quả táo/chuối hoặc 1 nắm hạt ngũ cốc / 1 ly Whey Protein.</p>
+          <p><strong>Bữa 2 (19:30 Tối):</strong> 150g Cá/Thịt heo nạc + 1/2 chén cơm lứt + Nhiều rau xanh/canh.</p>
+        </div>
+      </div>
+
+      <!-- Khối Affiliate Tiếp Thị Liên Kết (Shopee) -->
+      <div class="border-t pt-4 space-y-3">
+        <h4 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+          <span>🛒</span> Dụng Cụ & Thực Phẩm Hỗ Trợ Giảm Cân (Giá Siêu Tốt):
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          
+          <a href="https://s.shopee.vn/9fLcdxatAC?share_channel_code=6" target="_blank" class="p-3 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition flex items-center justify-between group">
+            <div>
+              <strong class="block text-slate-800 font-semibold group-hover:text-orange-600">⚖️ Cân Sức Khỏe Điện Tử</strong>
+              <span class="text-[11px] text-slate-500">Đo chính xác cân nặng hằng ngày</span>
+            </div>
+            <span class="bg-orange-500 text-white font-bold text-[10px] px-2 py-1 rounded-md">Xem Giá</span>
+          </a>
+
+          <a href="https://s.shopee.vn/9fLcdxatAC?share_channel_code=6" target="_blank" class="p-3 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition flex items-center justify-between group">
+            <div>
+              <strong class="block text-slate-800 font-semibold group-hover:text-orange-600">🏋️ Dây Kháng Lực Đa Năng</strong>
+              <span class="text-[11px] text-slate-500">Tập chân, mông, đùi tại nhà hiệu quả</span>
+            </div>
+            <span class="bg-orange-500 text-white font-bold text-[10px] px-2 py-1 rounded-md">Xem Giá</span>
+          </a>
+
+          <a href="https://s.shopee.vn/9fLcdxatAC?share_channel_code=6" target="_blank" class="p-3 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition flex items-center justify-between group">
+            <div>
+              <strong class="block text-slate-800 font-semibold group-hover:text-orange-600">🍳 Nồi Chiên Không Dầu</strong>
+              <span class="text-[11px] text-slate-500">Chế biến ức gà, khoai lang cực ngon</span>
+            </div>
+            <span class="bg-orange-500 text-white font-bold text-[10px] px-2 py-1 rounded-md">Xem Giá</span>
+          </a>
+
+          <a href="https://s.shopee.vn/9fLcdxatAC?share_channel_code=6" target="_blank" class="p-3 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition flex items-center justify-between group">
+            <div>
+              <strong class="block text-slate-800 font-semibold group-hover:text-orange-600">💧 Bình Nước Chia Vạch 2 Liter</strong>
+              <span class="text-[11px] text-slate-500">Nhắc nhở uống đủ 2L-3L nước khi nhịn</span>
+            </div>
+            <span class="bg-orange-500 text-white font-bold text-[10px] px-2 py-1 rounded-md">Xem Giá</span>
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="text-center py-4 text-xs text-slate-400">
+    © 2026 FitCalc 16:8. Công cụ tính chỉ số sức khỏe miễn phí.
+  </footer>
+
+  <script>
+    function calculateFit() {
+      const gender = document.getElementById('gender').value;
+      const age = parseFloat(document.getElementById('age').value) || 0;
+      const height = parseFloat(document.getElementById('height').value) || 0;
+      const weight = parseFloat(document.getElementById('weight').value) || 0;
+      const activity = parseFloat(document.getElementById('activity').value) || 1.2;
+
+      if (!height || !weight || !age) {
+        alert("Vui lòng nhập đầy đủ Chiều cao, Cân nặng và Tuổi!");
+        return;
+      }
+
+      const heightM = height / 100;
+      const bmi = (weight / (heightM * heightM)).toFixed(1);
+
+      let bmiStatus = "";
+      if (bmi < 18.5) bmiStatus = "Gầy";
+      else if (bmi < 23) bmiStatus = "Cân đối (Chuẩn)";
+      else if (bmi < 25) bmiStatus = "Thừa cân nhẹ";
+      else bmiStatus = "Béo phì (Cần giảm cân)";
+
+      let bmr = 0;
+      if (gender === 'male') {
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+      } else {
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+      }
+
+      const tdee = Math.round(bmr * activity);
+      const cutCalo = Math.round(tdee - 500);
+
+      document.getElementById('bmiVal').innerText = bmi;
+      document.getElementById('bmiStatus').innerText = bmiStatus;
+      document.getElementById('tdeeVal').innerText = tdee;
+      document.getElementById('cutCaloVal').innerText = cutCalo;
+
+      document.getElementById('resultBox').classList.remove('hidden');
+      document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
